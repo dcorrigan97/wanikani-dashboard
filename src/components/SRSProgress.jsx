@@ -77,6 +77,8 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
             name="Radicals"
             stackId="a"
             fill={TYPE_COLORS.radical}
+            stroke="#171310"
+            strokeWidth={2}
             cursor="pointer"
             onClick={handleBarClick('radical')}
           />
@@ -85,6 +87,8 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
             name="Kanji"
             stackId="a"
             fill={TYPE_COLORS.kanji}
+            stroke="#171310"
+            strokeWidth={2}
             cursor="pointer"
             onClick={handleBarClick('kanji')}
           />
@@ -93,6 +97,8 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
             name="Vocabulary"
             stackId="a"
             fill={TYPE_COLORS.vocabulary}
+            stroke="#171310"
+            strokeWidth={2}
             radius={[3, 3, 0, 0]}
             cursor="pointer"
             onClick={handleBarClick('vocabulary')}

@@ -379,6 +379,20 @@ button:disabled {
   white-space: nowrap;
 }
 
+/* --- SRS chart hover pop --- */
+
+.recharts-bar-rectangle {
+  transition: transform 0.15s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.recharts-bar-rectangle:hover,
+.recharts-bar-rectangle:active {
+  transform: scale(1.08);
+}
+
 /* --- Streak activity grid --- */
 
 .heatmap-grid {

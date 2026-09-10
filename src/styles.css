@@ -63,8 +63,8 @@ button:disabled {
 
 .token-setup {
   max-width: 480px;
-  margin: 80px auto;
-  padding: 0 20px;
+  margin: 0 auto;
+  padding: calc(80px + env(safe-area-inset-top)) 20px 40px;
 }
 
 .token-setup h1 {
@@ -98,7 +98,7 @@ button:disabled {
 .app {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 20px 60px;
+  padding: calc(24px + env(safe-area-inset-top)) 20px 60px;
 }
 
 .pull-indicator {

@@ -21,6 +21,7 @@ function displayCharacters(subject) {
 export default function AccuracyBreakdown({ reviewStatistics, subjects, className = '' }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
   const [revealed, setRevealed] = useState(new Set());
+  const [expanded, setExpanded] = useState(false);
 
   const toggle = (id) => {
     setRevealed((prev) => {
@@ -47,6 +48,8 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
       .slice(0, 15);
   }, [reviewStatistics]);
 
+  const visible = expanded ? worst : worst.slice(0, 5);
+
   return (
     <div className={`card ${className}`}>
       <h2>Trickiest Items</h2>
@@ -62,7 +65,7 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
           </tr>
         </thead>
         <tbody>
-          {worst.map((rs) => {
+          {visible.map((rs) => {
             const subject = subjectsById.get(rs.data.subject_id);
             const isRevealed = revealed.has(rs.id);
             const hideStyle = { filter: isRevealed ? 'none' : 'blur(6px)', transition: 'filter 0.15s' };
@@ -94,6 +97,11 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
           )}
         </tbody>
       </table>
+      {worst.length > 5 && (
+        <button className="expand-toggle" onClick={() => setExpanded((e) => !e)}>
+          {expanded ? '▴ Show less' : `▾ Show all ${worst.length}`}
+        </button>
+      )}
     </div>
   );
 }

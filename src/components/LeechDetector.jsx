@@ -22,6 +22,7 @@ function displayCharacters(subject) {
 export default function LeechDetector({ assignments, reviewStatistics, subjects, className = '' }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
   const [revealed, setRevealed] = useState(new Set());
+  const [expanded, setExpanded] = useState(false);
 
   const toggle = (id) => {
     setRevealed((prev) => {
@@ -55,6 +56,8 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
       .slice(0, 10);
   }, [reviewStatistics, stageBySubjectId]);
 
+  const visible = expanded ? leeches : leeches.slice(0, 5);
+
   return (
     <div className={`card ${className}`}>
       <h2>Leeches</h2>
@@ -72,7 +75,7 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
           </tr>
         </thead>
         <tbody>
-          {leeches.map((rs) => {
+          {visible.map((rs) => {
             const subject = subjectsById.get(rs.data.subject_id);
             const isRevealed = revealed.has(rs.id);
             const hideStyle = { filter: isRevealed ? 'none' : 'blur(6px)', transition: 'filter 0.15s' };
@@ -102,6 +105,11 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
           )}
         </tbody>
       </table>
+      {leeches.length > 5 && (
+        <button className="expand-toggle" onClick={() => setExpanded((e) => !e)}>
+          {expanded ? '▴ Show less' : `▾ Show all ${leeches.length}`}
+        </button>
+      )}
     </div>
   );
 }

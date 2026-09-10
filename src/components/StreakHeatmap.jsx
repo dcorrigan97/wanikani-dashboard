@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
-const WEEKS_TO_SHOW = 20; // fits comfortably in a card without horizontal scroll
-const COLORS = ['#1e1e1e', '#2d0a24', '#5c1152', '#a01880', '#dd0093'];
+const WEEKS_TO_SHOW = 12; // narrower tile in the bento layout than before
+const COLORS = ['#2c2419', '#3d2620', '#6b2f28', '#a8412f', '#e2604f'];
 
 // Local-timezone Y-M-D key, NOT toISOString() — toISOString converts to UTC,
 // which shifts evening activity onto the wrong calendar day for anyone west
@@ -34,7 +34,7 @@ function colorForCount(count, max) {
  * (common right after starting the app) would otherwise show as inactive
  * even though you were studying that day.
  */
-export default function StreakHeatmap({ reviewStatistics, assignments }) {
+export default function StreakHeatmap({ reviewStatistics, assignments, className = '' }) {
   const { days, max, currentStreak, itemsTracked } = useMemo(() => {
     const counts = new Map();
     const bump = (key) => counts.set(key, (counts.get(key) || 0) + 1);
@@ -68,20 +68,21 @@ export default function StreakHeatmap({ reviewStatistics, assignments }) {
     return { days, max, currentStreak, itemsTracked: reviewStatistics.length };
   }, [reviewStatistics, assignments]);
 
-  // Group into weeks (columns of 7), oldest first.
   const weeks = [];
   for (let i = 0; i < days.length; i += 7) {
     weeks.push(days.slice(i, i + 7));
   }
 
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <h2>Study Streak</h2>
-      <p className="card__subtitle">
-        {currentStreak} day{currentStreak === 1 ? '' : 's'} current streak · based on lesson &amp; review activity (
-        {itemsTracked.toLocaleString()} items tracked)
-      </p>
-      <div className="heatmap-grid">
+      <div className="streak-hero">
+        <div className="streak-hero__num">{currentStreak}</div>
+        <p className="card__subtitle" style={{ margin: 0 }}>
+          day{currentStreak === 1 ? '' : 's'} in a row · {itemsTracked.toLocaleString()} items tracked
+        </p>
+      </div>
+      <div className="heatmap-grid" style={{ justifyContent: 'center', marginTop: '18px' }}>
         {weeks.map((week, wi) => (
           <div className="heatmap-grid__col" key={wi}>
             {week.map((day) => (

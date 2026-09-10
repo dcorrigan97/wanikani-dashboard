@@ -5,7 +5,7 @@ function daysBetween(a, b) {
   return Math.max(0, (new Date(b) - new Date(a)) / (1000 * 60 * 60 * 24));
 }
 
-export default function LevelProgression({ levelProgressions }) {
+export default function LevelProgression({ levelProgressions, className = '' }) {
   const chartData = useMemo(() => {
     return levelProgressions
       .filter((lp) => lp.data.started_at)
@@ -30,18 +30,18 @@ export default function LevelProgression({ levelProgressions }) {
     : 0;
 
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <h2>Level Progression</h2>
       <p className="card__subtitle">
         {completedDays.length} level{completedDays.length === 1 ? '' : 's'} completed · avg {avg} days/level
       </p>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-          <XAxis dataKey="level" stroke="#999" interval={Math.ceil(chartData.length / 15)} />
-          <YAxis stroke="#999" label={{ value: 'days', angle: -90, position: 'insideLeft', fill: '#999' }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
+          <XAxis dataKey="level" stroke="#a59c8a" interval={Math.ceil(chartData.length / 15)} />
+          <YAxis stroke="#a59c8a" label={{ value: 'days', angle: -90, position: 'insideLeft', fill: '#a59c8a' }} />
           <Tooltip
-            contentStyle={{ background: '#1e1e1e', border: '1px solid #333' }}
+            contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
             formatter={(value, name, props) => [
               `${value} days${props.payload.inProgress ? ' (in progress)' : ''}`,
               'duration',
@@ -49,7 +49,7 @@ export default function LevelProgression({ levelProgressions }) {
           />
           <Bar dataKey="days" radius={[3, 3, 0, 0]}>
             {chartData.map((entry, i) => (
-              <Cell key={i} fill={entry.inProgress ? '#0093dd' : '#dd0093'} />
+              <Cell key={i} fill={entry.inProgress ? '#8da4c2' : '#d9ae3e'} />
             ))}
           </Bar>
         </BarChart>

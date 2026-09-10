@@ -13,7 +13,7 @@ function displayCharacters(subject) {
   return '(radical image)';
 }
 
-export default function AccuracyBreakdown({ reviewStatistics, subjects }) {
+export default function AccuracyBreakdown({ reviewStatistics, subjects, className = '' }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
 
   const worst = useMemo(() => {
@@ -33,7 +33,7 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects }) {
   }, [reviewStatistics]);
 
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <h2>Trickiest Items</h2>
       <p className="card__subtitle">Lowest accuracy, min. {MIN_ATTEMPTS} reviews</p>
       <table className="accuracy-table">
@@ -56,7 +56,7 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects }) {
                   <span
                     className="accuracy-pill"
                     style={{
-                      background: `rgba(221, 0, 147, ${1 - rs.data.percentage_correct / 100})`,
+                      background: `rgba(226, 96, 79, ${0.15 + (1 - rs.data.percentage_correct / 100) * 0.35})`,
                     }}
                   >
                     {rs.data.percentage_correct}%

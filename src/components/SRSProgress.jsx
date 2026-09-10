@@ -11,7 +11,7 @@ const BUCKETS = [
   { label: 'Burned', stages: [9] },
 ];
 
-const TYPE_COLORS = { radical: '#0093dd', kanji: '#dd0093', vocabulary: '#882d9e' };
+const TYPE_COLORS = { radical: '#8da4c2', kanji: '#e2604f', vocabulary: '#d9ae3e' };
 
 // kana_vocabulary (vocab written only in kana, e.g. だから) is visually and
 // pedagogically close enough to regular vocabulary to lump together here.
@@ -19,7 +19,7 @@ function normalizeType(t) {
   return t === 'kana_vocabulary' ? 'vocabulary' : t;
 }
 
-export default function SRSProgress({ assignments }) {
+export default function SRSProgress({ assignments, className = '' }) {
   const chartData = useMemo(() => {
     const started = assignments.filter((a) => a.data.started_at && !a.data.hidden);
     return BUCKETS.map((bucket) => {
@@ -35,15 +35,15 @@ export default function SRSProgress({ assignments }) {
   const totalStarted = chartData.reduce((sum, d) => sum + d.radical + d.kanji + d.vocabulary, 0);
 
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <h2>SRS Progress</h2>
       <p className="card__subtitle">{totalStarted.toLocaleString()} items currently in the SRS system</p>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-          <XAxis dataKey="name" stroke="#999" />
-          <YAxis stroke="#999" allowDecimals={false} />
-          <Tooltip contentStyle={{ background: '#1e1e1e', border: '1px solid #333' }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
+          <XAxis dataKey="name" stroke="#a59c8a" />
+          <YAxis stroke="#a59c8a" allowDecimals={false} />
+          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} />
           <Legend />
           <Bar dataKey="radical" name="Radicals" stackId="a" fill={TYPE_COLORS.radical} />
           <Bar dataKey="kanji" name="Kanji" stackId="a" fill={TYPE_COLORS.kanji} />

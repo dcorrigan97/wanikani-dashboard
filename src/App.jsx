@@ -25,13 +25,11 @@ export default function App() {
             {data ? `${data.user.username}'s Dashboard` : 'WaniKani Dashboard'}
           </h1>
           {data && (
-            <p className="app__meta">
-              Level {data.user.level} · last synced{' '}
-              {new Date(data.fetchedAt).toLocaleTimeString()}
-            </p>
+            <p className="app__meta">last synced {new Date(data.fetchedAt).toLocaleTimeString()}</p>
           )}
         </div>
         <div className="app__actions">
+          {data && <span className="level-badge">Level {data.user.level}</span>}
           <button onClick={() => reload()} disabled={status === 'loading'}>
             {status === 'loading' ? 'Syncing…' : 'Refresh'}
           </button>
@@ -57,13 +55,26 @@ export default function App() {
 
       {data && (
         <main className="grid">
-          <SRSProgress assignments={data.assignments} />
-          <LevelProgression levelProgressions={data.levelProgressions} />
-          <UpcomingReviews assignments={data.assignments} />
-          <StreakHeatmap reviewStatistics={data.reviewStatistics} assignments={data.assignments} />
-          <AccuracyBreakdown reviewStatistics={data.reviewStatistics} subjects={data.subjects} />
-          <LeechDetector assignments={data.assignments} reviewStatistics={data.reviewStatistics} subjects={data.subjects} />
-          <HistoryTrend progressHistory={progressHistory} />
+          <StreakHeatmap
+            reviewStatistics={data.reviewStatistics}
+            assignments={data.assignments}
+            className="tile--streak card--streak"
+          />
+          <SRSProgress assignments={data.assignments} className="tile--srs card--indigo" />
+          <LevelProgression levelProgressions={data.levelProgressions} className="tile--level card--gold" />
+          <UpcomingReviews assignments={data.assignments} className="tile--upcoming card--indigo" />
+          <AccuracyBreakdown
+            reviewStatistics={data.reviewStatistics}
+            subjects={data.subjects}
+            className="tile--trickiest card--sage"
+          />
+          <LeechDetector
+            assignments={data.assignments}
+            reviewStatistics={data.reviewStatistics}
+            subjects={data.subjects}
+            className="tile--leeches card--streak"
+          />
+          <HistoryTrend progressHistory={progressHistory} className="tile--history card--gold" />
         </main>
       )}
     </div>

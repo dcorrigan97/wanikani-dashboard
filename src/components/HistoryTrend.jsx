@@ -1,11 +1,11 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default function HistoryTrend({ progressHistory }) {
+export default function HistoryTrend({ progressHistory, className = '' }) {
   const hasEnoughData = progressHistory.length >= 2;
 
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <h2>Progress Over Time</h2>
       <p className="card__subtitle">
         {hasEnoughData
@@ -14,13 +14,13 @@ export default function HistoryTrend({ progressHistory }) {
       </p>
       <ResponsiveContainer width="100%" height={240}>
         <LineChart data={progressHistory} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-          <XAxis dataKey="date" stroke="#999" />
-          <YAxis stroke="#999" allowDecimals={false} />
-          <Tooltip contentStyle={{ background: '#1e1e1e', border: '1px solid #333' }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
+          <XAxis dataKey="date" stroke="#a59c8a" />
+          <YAxis stroke="#a59c8a" allowDecimals={false} />
+          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} />
           <Legend />
-          <Line type="monotone" dataKey="started" name="Items started" stroke="#0093dd" dot={false} strokeWidth={2} />
-          <Line type="monotone" dataKey="burned" name="Burned" stroke="#dd0093" dot={false} strokeWidth={2} />
+          <Line type="monotone" dataKey="started" name="Items started" stroke="#8da4c2" dot={false} strokeWidth={2} />
+          <Line type="monotone" dataKey="burned" name="Burned" stroke="#e2604f" dot={false} strokeWidth={2} />
         </LineChart>
       </ResponsiveContainer>
       <p className="card__footnote">

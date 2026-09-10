@@ -14,7 +14,7 @@ function displayCharacters(subject) {
   return '(radical image)';
 }
 
-export default function LeechDetector({ assignments, reviewStatistics, subjects }) {
+export default function LeechDetector({ assignments, reviewStatistics, subjects, className = '' }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
 
   const stageBySubjectId = useMemo(() => {
@@ -41,7 +41,7 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects 
   }, [reviewStatistics, stageBySubjectId]);
 
   return (
-    <div className="card">
+    <div className={`card ${className}`}>
       <h2>Leeches</h2>
       <p className="card__subtitle">
         Stuck below Guru despite {MIN_ATTEMPTS}+ reviews — worth extra attention
@@ -65,7 +65,7 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects 
                 <td>
                   <span
                     className="accuracy-pill"
-                    style={{ background: `rgba(221, 0, 147, ${1 - rs.data.percentage_correct / 100})` }}
+                    style={{ background: `rgba(226, 96, 79, ${0.15 + (1 - rs.data.percentage_correct / 100) * 0.35})` }}
                   >
                     {rs.data.percentage_correct}%
                   </span>

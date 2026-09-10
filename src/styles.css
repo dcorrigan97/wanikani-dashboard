@@ -395,14 +395,17 @@ button:disabled {
 /* --- SRS chart hover pop --- */
 
 .recharts-rectangle {
-  transition: transform 0.15s ease;
-  transform-box: fill-box;
-  transform-origin: center;
   -webkit-tap-highlight-color: transparent;
 }
 
-.recharts-rectangle:hover,
-.recharts-rectangle:active {
+.srs-chart .recharts-rectangle {
+  transition: transform 0.15s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.srs-chart .recharts-rectangle:hover,
+.srs-chart .recharts-rectangle:active {
   transform: scale(1.08);
 }
 

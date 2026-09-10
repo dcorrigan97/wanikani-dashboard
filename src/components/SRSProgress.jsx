@@ -81,7 +81,7 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
     <div className={`card ${className}`}>
       <h2>SRS Progress</h2>
       <p className="card__subtitle">{totalStarted.toLocaleString()} items currently in the SRS system · tap a bar segment to see the items</p>
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={280} className="srs-chart">
         <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
           <XAxis dataKey="name" stroke="#a59c8a" />

@@ -25,8 +25,14 @@ function primaryMeaning(subject) {
   return m?.meaning ?? 'Unknown';
 }
 
+function primaryReading(subject) {
+  const readings = subject?.data?.readings;
+  return readings && readings.length ? readings.join('、') : '—';
+}
+
 export default function SRSProgress({ assignments, subjects, className = '' }) {
   const [selected, setSelected] = useState(null); // { bucketLabel, type } | null
+  const [expandedChips, setExpandedChips] = useState(new Set());
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
 
   const started = useMemo(() => assignments.filter((a) => a.data.started_at && !a.data.hidden), [assignments]);
@@ -59,6 +65,16 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
     setSelected((prev) =>
       prev && prev.bucketLabel === data.name && prev.type === type ? null : { bucketLabel: data.name, type }
     );
+    setExpandedChips(new Set());
+  };
+
+  const toggleChip = (id) => {
+    setExpandedChips((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   return (
@@ -72,33 +88,13 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
           <YAxis stroke="#a59c8a" allowDecimals={false} />
           <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} cursor={false} />
           <Legend />
-          <Bar
-            dataKey="radical"
-            name="Radicals"
-            stackId="a"
-            fill={TYPE_COLORS.radical}
-            stroke="#171310"
-            strokeWidth={2}
-            cursor="pointer"
-            onClick={handleBarClick('radical')}
-          />
-          <Bar
-            dataKey="kanji"
-            name="Kanji"
-            stackId="a"
-            fill={TYPE_COLORS.kanji}
-            stroke="#171310"
-            strokeWidth={2}
-            cursor="pointer"
-            onClick={handleBarClick('kanji')}
-          />
+          <Bar dataKey="radical" name="Radicals" stackId="a" fill={TYPE_COLORS.radical} cursor="pointer" onClick={handleBarClick('radical')} />
+          <Bar dataKey="kanji" name="Kanji" stackId="a" fill={TYPE_COLORS.kanji} cursor="pointer" onClick={handleBarClick('kanji')} />
           <Bar
             dataKey="vocabulary"
             name="Vocabulary"
             stackId="a"
             fill={TYPE_COLORS.vocabulary}
-            stroke="#171310"
-            strokeWidth={2}
             radius={[3, 3, 0, 0]}
             cursor="pointer"
             onClick={handleBarClick('vocabulary')}
@@ -117,12 +113,24 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
             </button>
           </div>
           <div className="drilldown__grid">
-            {drilldownItems.map((subject) => (
-              <div className="drilldown__chip" key={subject.id} title={primaryMeaning(subject)}>
-                <div className="drilldown__char">{subject.data.characters || '?'}</div>
-                <div className="drilldown__meaning">{primaryMeaning(subject)}</div>
-              </div>
-            ))}
+            {drilldownItems.map((subject) => {
+              const isOpen = expandedChips.has(subject.id);
+              return (
+                <div
+                  className={`drilldown__chip ${isOpen ? 'drilldown__chip--open' : ''}`}
+                  key={subject.id}
+                  onClick={() => toggleChip(subject.id)}
+                >
+                  <div className="drilldown__char">{subject.data.characters || '?'}</div>
+                  {isOpen && (
+                    <>
+                      <div className="drilldown__reading">{primaryReading(subject)}</div>
+                      <div className="drilldown__meaning">{primaryMeaning(subject)}</div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
             {drilldownItems.length === 0 && <p className="card__subtitle">No items in this group.</p>}
           </div>
         </div>

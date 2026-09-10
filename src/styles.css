@@ -361,6 +361,16 @@ button:disabled {
   padding: 8px 10px;
   text-align: center;
   min-width: 64px;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.drilldown__chip:hover {
+  border-color: var(--hanko);
+}
+
+.drilldown__chip--open {
+  min-width: 100px;
 }
 
 .drilldown__char {
@@ -369,14 +379,17 @@ button:disabled {
   font-weight: 700;
 }
 
+.drilldown__reading {
+  font-size: 11px;
+  color: var(--indigo);
+  margin-top: 4px;
+}
+
 .drilldown__meaning {
   font-size: 10px;
   color: var(--ink-soft);
   margin-top: 2px;
-  max-width: 80px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100px;
 }
 
 /* --- SRS chart hover pop --- */

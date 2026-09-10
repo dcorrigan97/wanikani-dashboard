@@ -60,7 +60,7 @@ export default function App() {
             assignments={data.assignments}
             className="tile--streak card--streak"
           />
-          <SRSProgress assignments={data.assignments} className="tile--srs card--indigo" />
+          <SRSProgress assignments={data.assignments} subjects={data.subjects} className="tile--srs card--indigo" />
           <LevelProgression levelProgressions={data.levelProgressions} className="tile--level card--gold" />
           <UpcomingReviews assignments={data.assignments} className="tile--upcoming card--indigo" />
           <AccuracyBreakdown

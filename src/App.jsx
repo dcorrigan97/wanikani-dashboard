@@ -1,5 +1,6 @@
 import React from 'react';
 import { useWaniKaniData } from './hooks/useWaniKaniData.js';
+import { usePullToRefresh } from './hooks/usePullToRefresh.js';
 import TokenSetup from './components/TokenSetup.jsx';
 import SRSProgress from './components/SRSProgress.jsx';
 import AccuracyBreakdown from './components/AccuracyBreakdown.jsx';
@@ -8,28 +9,40 @@ import LevelProgression from './components/LevelProgression.jsx';
 import UpcomingReviews from './components/UpcomingReviews.jsx';
 import HistoryTrend from './components/HistoryTrend.jsx';
 import LeechDetector from './components/LeechDetector.jsx';
+import CardError from './components/CardError.jsx';
 
 export default function App() {
-  const { token, setToken, clearToken, status, statusMessage, data, progressHistory, error, reload } =
+  const { token, setToken, clearToken, status, statusMessage, data, errors, progressHistory, reload } =
     useWaniKaniData();
+
+  const { pullDistance, threshold } = usePullToRefresh(() => reload(), status === 'loading' || !token);
 
   if (!token) {
     return <TokenSetup onSubmit={setToken} />;
   }
 
+  const has = (...keys) => keys.every((k) => data && data[k]);
+
   return (
     <div className="app">
+      <div
+        className="pull-indicator"
+        style={{ height: pullDistance, opacity: pullDistance > 0 ? 1 : 0 }}
+      >
+        {pullDistance > threshold ? '↑ Release to refresh' : '↓ Pull to refresh'}
+      </div>
+
       <header className="app__header">
         <div>
           <h1>
-            {data ? `${data.user.username}'s Dashboard` : 'WaniKani Dashboard'}
+            {data?.user ? `${data.user.username}'s Dashboard` : 'WaniKani Dashboard'}
           </h1>
           {data && (
             <p className="app__meta">last synced {new Date(data.fetchedAt).toLocaleTimeString()}</p>
           )}
         </div>
         <div className="app__actions">
-          {data && <span className="level-badge">Level {data.user.level}</span>}
+          {data?.user && <span className="level-badge">Level {data.user.level}</span>}
           <button onClick={() => reload()} disabled={status === 'loading'}>
             {status === 'loading' ? 'Syncing…' : 'Refresh'}
           </button>
@@ -48,32 +61,92 @@ export default function App() {
 
       {status === 'error' && (
         <div className="status-message status-message--error">
-          {error}
+          Couldn't reach WaniKani — check your token and connection.
           <button onClick={() => reload()}>Try again</button>
         </div>
       )}
 
       {data && (
         <main className="grid">
-          <StreakHeatmap
-            reviewStatistics={data.reviewStatistics}
-            assignments={data.assignments}
-            className="tile--streak card--streak"
-          />
-          <SRSProgress assignments={data.assignments} subjects={data.subjects} className="tile--srs card--indigo" />
-          <LevelProgression levelProgressions={data.levelProgressions} className="tile--level card--gold" />
-          <UpcomingReviews assignments={data.assignments} className="tile--upcoming card--indigo" />
-          <AccuracyBreakdown
-            reviewStatistics={data.reviewStatistics}
-            subjects={data.subjects}
-            className="tile--trickiest card--sage"
-          />
-          <LeechDetector
-            assignments={data.assignments}
-            reviewStatistics={data.reviewStatistics}
-            subjects={data.subjects}
-            className="tile--leeches card--streak"
-          />
+          {has('reviewStatistics', 'assignments') ? (
+            <StreakHeatmap
+              reviewStatistics={data.reviewStatistics}
+              assignments={data.assignments}
+              className="tile--streak card--streak"
+            />
+          ) : (
+            <CardError
+              label="Study Streak"
+              message={errors.reviewStatistics || errors.assignments}
+              onRetry={reload}
+              className="tile--streak card--streak"
+            />
+          )}
+
+          {has('assignments', 'subjects') ? (
+            <SRSProgress assignments={data.assignments} subjects={data.subjects} className="tile--srs card--indigo" />
+          ) : (
+            <CardError
+              label="SRS Progress"
+              message={errors.assignments || errors.subjects}
+              onRetry={reload}
+              className="tile--srs card--indigo"
+            />
+          )}
+
+          {has('levelProgressions') ? (
+            <LevelProgression levelProgressions={data.levelProgressions} className="tile--level card--gold" />
+          ) : (
+            <CardError
+              label="Level Progression"
+              message={errors.levelProgressions}
+              onRetry={reload}
+              className="tile--level card--gold"
+            />
+          )}
+
+          {has('assignments') ? (
+            <UpcomingReviews assignments={data.assignments} className="tile--upcoming card--indigo" />
+          ) : (
+            <CardError
+              label="Upcoming Reviews"
+              message={errors.assignments}
+              onRetry={reload}
+              className="tile--upcoming card--indigo"
+            />
+          )}
+
+          {has('reviewStatistics', 'subjects') ? (
+            <AccuracyBreakdown
+              reviewStatistics={data.reviewStatistics}
+              subjects={data.subjects}
+              className="tile--trickiest card--sage"
+            />
+          ) : (
+            <CardError
+              label="Trickiest Items"
+              message={errors.reviewStatistics || errors.subjects}
+              onRetry={reload}
+              className="tile--trickiest card--sage"
+            />
+          )}
+
+          {has('assignments', 'reviewStatistics', 'subjects') ? (
+            <LeechDetector
+              assignments={data.assignments}
+              reviewStatistics={data.reviewStatistics}
+              subjects={data.subjects}
+              className="tile--leeches card--streak"
+            />
+          ) : (
+            <CardError
+              label="Leeches"
+              message={errors.assignments || errors.reviewStatistics || errors.subjects}
+              onRetry={reload}
+              className="tile--leeches card--streak"
+            />
+          )}
+
           <HistoryTrend progressHistory={progressHistory} className="tile--history card--gold" />
         </main>
       )}

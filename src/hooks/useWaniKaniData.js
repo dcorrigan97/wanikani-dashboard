@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { wanikani } from '../api/wanikani.js';
 import { history } from '../utils/history.js';
 
@@ -9,8 +9,10 @@ export function useWaniKaniData() {
   const [status, setStatus] = useState('idle'); // idle | loading | ready | error
   const [statusMessage, setStatusMessage] = useState('');
   const [data, setData] = useState(null);
+  const [errors, setErrors] = useState({}); // { user, assignments, reviewStatistics, levelProgressions, subjects }
   const [progressHistory, setProgressHistory] = useState(() => history.loadHistory());
-  const [error, setError] = useState(null);
+  const dataRef = useRef(null);
+  dataRef.current = data;
 
   const setToken = useCallback((newToken) => {
     localStorage.setItem(TOKEN_KEY, newToken);
@@ -21,6 +23,7 @@ export function useWaniKaniData() {
     localStorage.removeItem(TOKEN_KEY);
     setTokenState('');
     setData(null);
+    setErrors({});
     setStatus('idle');
   }, []);
 
@@ -28,42 +31,60 @@ export function useWaniKaniData() {
     async (opts = {}) => {
       if (!token) return;
       setStatus('loading');
-      setError(null);
-      try {
-        setStatusMessage('Fetching user info…');
-        const user = await wanikani.getUser(token);
+      setStatusMessage('Syncing with WaniKani…');
 
-        setStatusMessage('Fetching assignments (SRS progress)…');
-        const assignments = await wanikani.getAssignments(token);
+      const [userR, assignmentsR, reviewStatsR, levelProgR, subjectsR] = await Promise.allSettled([
+        wanikani.getUser(token),
+        wanikani.getAssignments(token),
+        wanikani.getReviewStatistics(token),
+        wanikani.getLevelProgressions(token),
+        wanikani.getSubjects(token, { forceRefresh: opts.forceRefreshSubjects }),
+      ]);
 
-        setStatusMessage('Fetching review statistics (accuracy)…');
-        const reviewStatistics = await wanikani.getReviewStatistics(token);
+      const prev = dataRef.current;
+      const pick = (result, key) => (result.status === 'fulfilled' ? result.value : prev?.[key]);
 
-        setStatusMessage('Fetching level progressions…');
-        const levelProgressions = await wanikani.getLevelProgressions(token);
+      const newData = {
+        user: pick(userR, 'user'),
+        assignments: pick(assignmentsR, 'assignments'),
+        reviewStatistics: pick(reviewStatsR, 'reviewStatistics'),
+        levelProgressions: pick(levelProgR, 'levelProgressions'),
+        subjects: pick(subjectsR, 'subjects'),
+        fetchedAt: new Date().toISOString(),
+      };
 
-        setStatusMessage('Fetching subjects (cached after first run)…');
-        const subjects = await wanikani.getSubjects(token, {
-          forceRefresh: opts.forceRefreshSubjects,
-        });
+      const newErrors = {};
+      [
+        ['user', userR],
+        ['assignments', assignmentsR],
+        ['reviewStatistics', reviewStatsR],
+        ['levelProgressions', levelProgR],
+        ['subjects', subjectsR],
+      ].forEach(([key, result]) => {
+        if (result.status === 'rejected') {
+          console.error(`Failed to fetch ${key}:`, result.reason);
+          newErrors[key] = result.reason?.message || 'Failed to load.';
+        }
+      });
 
-        const loaded = {
-          user,
-          assignments,
-          reviewStatistics,
-          levelProgressions,
-          subjects,
-          fetchedAt: new Date().toISOString(),
-        };
-        setData(loaded);
-        setProgressHistory(history.saveSnapshot(loaded));
-        setStatus('ready');
-        setStatusMessage('');
-      } catch (err) {
-        console.error(err);
-        setError(err.message || 'Something went wrong talking to the WaniKani API.');
+      const allFailed = Object.keys(newErrors).length === 5;
+
+      if (allFailed) {
+        // Nothing loaded at all — most likely a bad/expired token. Don't
+        // publish a data object with everything empty; show a real error.
+        setErrors(newErrors);
         setStatus('error');
+        setStatusMessage('');
+        return;
       }
+
+      setData(newData);
+      setErrors(newErrors);
+      if (newData.user && newData.assignments && newData.reviewStatistics) {
+        setProgressHistory(history.saveSnapshot(newData));
+      }
+      setStatus('ready');
+      setStatusMessage('');
     },
     [token]
   );
@@ -73,5 +94,5 @@ export function useWaniKaniData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  return { token, setToken, clearToken, status, statusMessage, data, progressHistory, error, reload: load };
+  return { token, setToken, clearToken, status, statusMessage, data, errors, progressHistory, reload: load };
 }

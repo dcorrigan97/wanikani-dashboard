@@ -101,6 +101,16 @@ button:disabled {
   padding: 24px 20px 60px;
 }
 
+.pull-indicator {
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+  transition: height 0.1s linear, opacity 0.1s linear;
+}
+
 .app__header {
   display: flex;
   justify-content: space-between;
@@ -226,6 +236,19 @@ button:disabled {
 
 .card--sage {
   border-left-color: var(--sage);
+}
+
+.card--error {
+  border-left-color: var(--hanko);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.card--error button {
+  margin-top: 4px;
 }
 
 .card h2 {

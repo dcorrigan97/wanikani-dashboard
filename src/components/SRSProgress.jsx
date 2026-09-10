@@ -70,7 +70,7 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
           <XAxis dataKey="name" stroke="#a59c8a" />
           <YAxis stroke="#a59c8a" allowDecimals={false} />
-          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} />
+          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} cursor={false} />
           <Legend />
           <Bar
             dataKey="radical"

@@ -51,15 +51,19 @@ async function fetchSingle(token, endpoint) {
 // arrays, etc.) — vocabulary items in particular can carry dozens of audio
 // entries each. Caching the raw objects blows past the ~5-10MB localStorage
 // quota, so we slim each subject down to just what the components read.
-const SUBJECTS_CACHE_KEY = 'wk_subjects_cache_v2';
-const SUBJECTS_CACHE_META_KEY = 'wk_subjects_cache_meta_v2';
+// Bumped to v3 to add primary readings (small — just short strings, not the
+// audio arrays that caused the original quota problem).
+const SUBJECTS_CACHE_KEY = 'wk_subjects_cache_v3';
+const SUBJECTS_CACHE_META_KEY = 'wk_subjects_cache_meta_v3';
 
 function slimSubject(s) {
+  const readings = (s.data.readings || []).filter((r) => r.primary).map((r) => r.reading);
   return {
     id: s.id,
     data: {
       characters: s.data.characters,
       meanings: s.data.meanings,
+      readings,
       level: s.data.level,
     },
   };
@@ -117,10 +121,12 @@ async function getSubjects(token, { forceRefresh = false } = {}) {
 function clearSubjectsCache() {
   localStorage.removeItem(SUBJECTS_CACHE_KEY);
   localStorage.removeItem(SUBJECTS_CACHE_META_KEY);
-  // Also clear the old (pre-slimming) cache key in case it's still sitting
-  // there from before this fix, taking up quota space.
+  // Also clear older pre-readings cache keys in case they're still sitting
+  // there from before this change, taking up quota space.
   localStorage.removeItem('wk_subjects_cache_v1');
   localStorage.removeItem('wk_subjects_cache_meta_v1');
+  localStorage.removeItem('wk_subjects_cache_v2');
+  localStorage.removeItem('wk_subjects_cache_meta_v2');
 }
 
 async function getUser(token) {

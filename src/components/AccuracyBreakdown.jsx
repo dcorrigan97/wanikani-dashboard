@@ -1,10 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const MIN_ATTEMPTS = 4; // ignore items with too few reviews to mean much
 
 function primaryMeaning(subject) {
   const m = subject?.data?.meanings?.find((x) => x.primary) || subject?.data?.meanings?.[0];
   return m?.meaning ?? 'Unknown';
+}
+
+function primaryReading(subject) {
+  const readings = subject?.data?.readings;
+  return readings && readings.length ? readings.join('、') : '—';
 }
 
 function displayCharacters(subject) {
@@ -15,6 +20,16 @@ function displayCharacters(subject) {
 
 export default function AccuracyBreakdown({ reviewStatistics, subjects, className = '' }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
+  const [revealed, setRevealed] = useState(new Set());
+
+  const toggle = (id) => {
+    setRevealed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const worst = useMemo(() => {
     return reviewStatistics
@@ -35,12 +50,13 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
   return (
     <div className={`card ${className}`}>
       <h2>Trickiest Items</h2>
-      <p className="card__subtitle">Lowest accuracy, min. {MIN_ATTEMPTS} reviews</p>
+      <p className="card__subtitle">Lowest accuracy, min. {MIN_ATTEMPTS} reviews · tap a row to reveal</p>
       <table className="accuracy-table">
         <thead>
           <tr>
             <th>Item</th>
             <th>Meaning</th>
+            <th>Reading</th>
             <th>Accuracy</th>
             <th>Reviews</th>
           </tr>
@@ -48,10 +64,15 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
         <tbody>
           {worst.map((rs) => {
             const subject = subjectsById.get(rs.data.subject_id);
+            const isRevealed = revealed.has(rs.id);
+            const hideStyle = { filter: isRevealed ? 'none' : 'blur(6px)', transition: 'filter 0.15s' };
             return (
-              <tr key={rs.id}>
+              <tr key={rs.id} onClick={() => toggle(rs.id)} style={{ cursor: 'pointer' }}>
                 <td className="accuracy-table__char">{displayCharacters(subject)}</td>
-                <td>{primaryMeaning(subject)}</td>
+                <td style={hideStyle}>{primaryMeaning(subject)}</td>
+                <td className="accuracy-table__char" style={hideStyle}>
+                  {primaryReading(subject)}
+                </td>
                 <td>
                   <span
                     className="accuracy-pill"
@@ -68,7 +89,7 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
           })}
           {worst.length === 0 && (
             <tr>
-              <td colSpan={4}>Not enough review history yet.</td>
+              <td colSpan={5}>Not enough review history yet.</td>
             </tr>
           )}
         </tbody>

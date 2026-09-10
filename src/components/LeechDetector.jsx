@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const MIN_ATTEMPTS = 6; // enough reviews that "still stuck" is a real signal, not noise
 const STUCK_STAGES = [0, 1, 2, 3, 4]; // not yet past Apprentice
@@ -6,6 +6,11 @@ const STUCK_STAGES = [0, 1, 2, 3, 4]; // not yet past Apprentice
 function primaryMeaning(subject) {
   const m = subject?.data?.meanings?.find((x) => x.primary) || subject?.data?.meanings?.[0];
   return m?.meaning ?? 'Unknown';
+}
+
+function primaryReading(subject) {
+  const readings = subject?.data?.readings;
+  return readings && readings.length ? readings.join('、') : '—';
 }
 
 function displayCharacters(subject) {
@@ -16,6 +21,16 @@ function displayCharacters(subject) {
 
 export default function LeechDetector({ assignments, reviewStatistics, subjects, className = '' }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
+  const [revealed, setRevealed] = useState(new Set());
+
+  const toggle = (id) => {
+    setRevealed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const stageBySubjectId = useMemo(() => {
     const map = new Map();
@@ -44,13 +59,14 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
     <div className={`card ${className}`}>
       <h2>Leeches</h2>
       <p className="card__subtitle">
-        Stuck below Guru despite {MIN_ATTEMPTS}+ reviews — worth extra attention
+        Stuck below Guru despite {MIN_ATTEMPTS}+ reviews · tap a row to reveal
       </p>
       <table className="accuracy-table">
         <thead>
           <tr>
             <th>Item</th>
             <th>Meaning</th>
+            <th>Reading</th>
             <th>Accuracy</th>
             <th>Attempts</th>
           </tr>
@@ -58,10 +74,15 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
         <tbody>
           {leeches.map((rs) => {
             const subject = subjectsById.get(rs.data.subject_id);
+            const isRevealed = revealed.has(rs.id);
+            const hideStyle = { filter: isRevealed ? 'none' : 'blur(6px)', transition: 'filter 0.15s' };
             return (
-              <tr key={rs.id}>
+              <tr key={rs.id} onClick={() => toggle(rs.id)} style={{ cursor: 'pointer' }}>
                 <td className="accuracy-table__char">{displayCharacters(subject)}</td>
-                <td>{primaryMeaning(subject)}</td>
+                <td style={hideStyle}>{primaryMeaning(subject)}</td>
+                <td className="accuracy-table__char" style={hideStyle}>
+                  {primaryReading(subject)}
+                </td>
                 <td>
                   <span
                     className="accuracy-pill"
@@ -76,7 +97,7 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
           })}
           {leeches.length === 0 && (
             <tr>
-              <td colSpan={4}>No leeches right now — nice.</td>
+              <td colSpan={5}>No leeches right now — nice.</td>
             </tr>
           )}
         </tbody>

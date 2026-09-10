@@ -5,9 +5,13 @@ import SRSProgress from './components/SRSProgress.jsx';
 import AccuracyBreakdown from './components/AccuracyBreakdown.jsx';
 import StreakHeatmap from './components/StreakHeatmap.jsx';
 import LevelProgression from './components/LevelProgression.jsx';
+import UpcomingReviews from './components/UpcomingReviews.jsx';
+import HistoryTrend from './components/HistoryTrend.jsx';
+import LeechDetector from './components/LeechDetector.jsx';
 
 export default function App() {
-  const { token, setToken, clearToken, status, statusMessage, data, error, reload } = useWaniKaniData();
+  const { token, setToken, clearToken, status, statusMessage, data, progressHistory, error, reload } =
+    useWaniKaniData();
 
   if (!token) {
     return <TokenSetup onSubmit={setToken} />;
@@ -55,8 +59,11 @@ export default function App() {
         <main className="grid">
           <SRSProgress assignments={data.assignments} />
           <LevelProgression levelProgressions={data.levelProgressions} />
+          <UpcomingReviews assignments={data.assignments} />
           <StreakHeatmap reviewStatistics={data.reviewStatistics} assignments={data.assignments} />
           <AccuracyBreakdown reviewStatistics={data.reviewStatistics} subjects={data.subjects} />
+          <LeechDetector assignments={data.assignments} reviewStatistics={data.reviewStatistics} subjects={data.subjects} />
+          <HistoryTrend progressHistory={progressHistory} />
         </main>
       )}
     </div>

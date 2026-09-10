@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { wanikani } from '../api/wanikani.js';
+import { history } from '../utils/history.js';
 
 const TOKEN_KEY = 'wk_api_token';
 
@@ -8,6 +9,7 @@ export function useWaniKaniData() {
   const [status, setStatus] = useState('idle'); // idle | loading | ready | error
   const [statusMessage, setStatusMessage] = useState('');
   const [data, setData] = useState(null);
+  const [progressHistory, setProgressHistory] = useState(() => history.loadHistory());
   const [error, setError] = useState(null);
 
   const setToken = useCallback((newToken) => {
@@ -45,14 +47,16 @@ export function useWaniKaniData() {
           forceRefresh: opts.forceRefreshSubjects,
         });
 
-        setData({
+        const loaded = {
           user,
           assignments,
           reviewStatistics,
           levelProgressions,
           subjects,
           fetchedAt: new Date().toISOString(),
-        });
+        };
+        setData(loaded);
+        setProgressHistory(history.saveSnapshot(loaded));
         setStatus('ready');
         setStatusMessage('');
       } catch (err) {
@@ -69,5 +73,5 @@ export function useWaniKaniData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  return { token, setToken, clearToken, status, statusMessage, data, error, reload: load };
+  return { token, setToken, clearToken, status, statusMessage, data, progressHistory, error, reload: load };
 }

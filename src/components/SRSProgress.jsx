@@ -1,27 +1,38 @@
 import React, { useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // WaniKani srs_stage: 0 = not started, 1-4 = Apprentice, 5-6 = Guru,
 // 7 = Master, 8 = Enlightened, 9 = Burned.
 const BUCKETS = [
-  { label: 'Apprentice', stages: [1, 2, 3, 4], color: '#dd0093' },
-  { label: 'Guru', stages: [5, 6], color: '#882d9e' },
-  { label: 'Master', stages: [7], color: '#294ddb' },
-  { label: 'Enlightened', stages: [8], color: '#0093dd' },
-  { label: 'Burned', stages: [9], color: '#434343' },
+  { label: 'Apprentice', stages: [1, 2, 3, 4] },
+  { label: 'Guru', stages: [5, 6] },
+  { label: 'Master', stages: [7] },
+  { label: 'Enlightened', stages: [8] },
+  { label: 'Burned', stages: [9] },
 ];
+
+const TYPE_COLORS = { radical: '#0093dd', kanji: '#dd0093', vocabulary: '#882d9e' };
+
+// kana_vocabulary (vocab written only in kana, e.g. だから) is visually and
+// pedagogically close enough to regular vocabulary to lump together here.
+function normalizeType(t) {
+  return t === 'kana_vocabulary' ? 'vocabulary' : t;
+}
 
 export default function SRSProgress({ assignments }) {
   const chartData = useMemo(() => {
     const started = assignments.filter((a) => a.data.started_at && !a.data.hidden);
-    return BUCKETS.map((bucket) => ({
-      name: bucket.label,
-      count: started.filter((a) => bucket.stages.includes(a.data.srs_stage)).length,
-      color: bucket.color,
-    }));
+    return BUCKETS.map((bucket) => {
+      const inBucket = started.filter((a) => bucket.stages.includes(a.data.srs_stage));
+      const row = { name: bucket.label };
+      ['radical', 'kanji', 'vocabulary'].forEach((type) => {
+        row[type] = inBucket.filter((a) => normalizeType(a.data.subject_type) === type).length;
+      });
+      return row;
+    });
   }, [assignments]);
 
-  const totalStarted = chartData.reduce((sum, d) => sum + d.count, 0);
+  const totalStarted = chartData.reduce((sum, d) => sum + d.radical + d.kanji + d.vocabulary, 0);
 
   return (
     <div className="card">
@@ -32,15 +43,11 @@ export default function SRSProgress({ assignments }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
           <XAxis dataKey="name" stroke="#999" />
           <YAxis stroke="#999" allowDecimals={false} />
-          <Tooltip
-            contentStyle={{ background: '#1e1e1e', border: '1px solid #333' }}
-            formatter={(value) => [value.toLocaleString(), 'items']}
-          />
-          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-            {chartData.map((entry, i) => (
-              <Cell key={i} fill={entry.color} />
-            ))}
-          </Bar>
+          <Tooltip contentStyle={{ background: '#1e1e1e', border: '1px solid #333' }} />
+          <Legend />
+          <Bar dataKey="radical" name="Radicals" stackId="a" fill={TYPE_COLORS.radical} />
+          <Bar dataKey="kanji" name="Kanji" stackId="a" fill={TYPE_COLORS.kanji} />
+          <Bar dataKey="vocabulary" name="Vocabulary" stackId="a" fill={TYPE_COLORS.vocabulary} radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

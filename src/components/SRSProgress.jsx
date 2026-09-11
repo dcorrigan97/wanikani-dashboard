@@ -2,10 +2,16 @@ import React, { useMemo, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // WaniKani srs_stage: 0 = not started, 1-4 = Apprentice, 5-6 = Guru,
-// 7 = Master, 8 = Enlightened, 9 = Burned.
+// 7 = Master, 8 = Enlightened, 9 = Burned. Broken into individual sub-stages
+// here (matching WaniKani's own "Active Item Spread" chart) instead of
+// collapsing Apprentice/Guru into one bucket each.
 const BUCKETS = [
-  { label: 'Apprentice', stages: [1, 2, 3, 4] },
-  { label: 'Guru', stages: [5, 6] },
+  { label: 'Apprentice 1', stages: [1] },
+  { label: 'Apprentice 2', stages: [2] },
+  { label: 'Apprentice 3', stages: [3] },
+  { label: 'Apprentice 4', stages: [4] },
+  { label: 'Guru 1', stages: [5] },
+  { label: 'Guru 2', stages: [6] },
   { label: 'Master', stages: [7] },
   { label: 'Enlightened', stages: [8] },
   { label: 'Burned', stages: [9] },
@@ -81,10 +87,10 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
     <div className={`card ${className}`}>
       <h2>SRS Progress</h2>
       <p className="card__subtitle">{totalStarted.toLocaleString()} items currently in the SRS system · tap a bar segment to see the items</p>
-      <ResponsiveContainer width="100%" height={280} className="srs-chart">
-        <BarChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+      <ResponsiveContainer width="100%" height={310} className="srs-chart">
+        <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 28 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
-          <XAxis dataKey="name" stroke="#a59c8a" />
+          <XAxis dataKey="name" stroke="#a59c8a" angle={-40} textAnchor="end" interval={0} tick={{ fontSize: 11 }} height={50} />
           <YAxis stroke="#a59c8a" allowDecimals={false} />
           <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} cursor={false} />
           <Legend />

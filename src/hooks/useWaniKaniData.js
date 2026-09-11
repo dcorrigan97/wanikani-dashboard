@@ -94,5 +94,25 @@ export function useWaniKaniData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
-  return { token, setToken, clearToken, status, statusMessage, data, errors, progressHistory, reload: load };
+  const editHistoryEntry = useCallback((date, fields) => {
+    setProgressHistory(history.upsertManualEntry(date, fields));
+  }, []);
+
+  const deleteHistoryEntry = useCallback((date) => {
+    setProgressHistory(history.deleteEntry(date));
+  }, []);
+
+  return {
+    token,
+    setToken,
+    clearToken,
+    status,
+    statusMessage,
+    data,
+    errors,
+    progressHistory,
+    reload: load,
+    editHistoryEntry,
+    deleteHistoryEntry,
+  };
 }

@@ -76,4 +76,37 @@ function saveSnapshot(loadedData) {
   return trimmed;
 }
 
-export const history = { loadHistory, saveSnapshot };
+/**
+ * Manually add or correct an entry for a given date (e.g. filling in a day
+ * that got skipped). Merges with an existing entry for that date if one
+ * exists, so editing just "started"/"burned" doesn't clobber other fields.
+ */
+function upsertManualEntry(date, fields) {
+  const entries = loadHistory();
+  const idx = entries.findIndex((e) => e.date === date);
+  if (idx >= 0) {
+    entries[idx] = { ...entries[idx], ...fields };
+  } else {
+    entries.push({ date, started: 0, burned: 0, ...fields });
+  }
+  entries.sort((a, b) => (a.date < b.date ? -1 : 1));
+  const trimmed = entries.slice(-MAX_ENTRIES);
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+  } catch (err) {
+    console.warn('Could not save history entry:', err.message);
+  }
+  return trimmed;
+}
+
+function deleteEntry(date) {
+  const entries = loadHistory().filter((e) => e.date !== date);
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+  } catch (err) {
+    console.warn('Could not delete history entry:', err.message);
+  }
+  return entries;
+}
+
+export const history = { loadHistory, saveSnapshot, upsertManualEntry, deleteEntry };

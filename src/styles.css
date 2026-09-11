@@ -93,6 +93,12 @@ button:disabled {
   font-family: 'Zen Kaku Gothic New', sans-serif;
 }
 
+.token-setup__restore {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
 /* --- App shell --- */
 
 .app {
@@ -344,6 +350,64 @@ button:disabled {
 .expand-toggle:hover {
   color: var(--hanko);
   border-color: var(--hanko);
+}
+
+/* --- History edit panel --- */
+
+.history-edit {
+  margin-top: 12px;
+}
+
+.history-edit__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.history-edit__form input {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  flex: 1 1 100px;
+}
+
+.history-edit__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.history-edit__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.history-edit__row span {
+  cursor: pointer;
+}
+
+.history-edit__row span:hover {
+  color: var(--ink);
+}
+
+.history-edit__delete {
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 999px;
+  background: transparent;
 }
 
 /* --- SRS drilldown panel --- */

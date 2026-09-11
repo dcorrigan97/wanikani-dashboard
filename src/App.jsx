@@ -1,6 +1,8 @@
 import React from 'react';
 import { useWaniKaniData } from './hooks/useWaniKaniData.js';
 import { usePullToRefresh } from './hooks/usePullToRefresh.js';
+import { exportBackup } from './utils/backup.js';
+import { forceUpdate } from './utils/swUpdate.js';
 import TokenSetup from './components/TokenSetup.jsx';
 import SRSProgress from './components/SRSProgress.jsx';
 import AccuracyBreakdown from './components/AccuracyBreakdown.jsx';
@@ -12,7 +14,7 @@ import LeechDetector from './components/LeechDetector.jsx';
 import CardError from './components/CardError.jsx';
 
 export default function App() {
-  const { token, setToken, clearToken, status, statusMessage, data, errors, progressHistory, reload } =
+  const { token, setToken, clearToken, status, statusMessage, data, errors, progressHistory, reload, editHistoryEntry, deleteHistoryEntry } =
     useWaniKaniData();
 
   const { pullDistance, threshold } = usePullToRefresh(() => reload(), status === 'loading' || !token);
@@ -49,6 +51,8 @@ export default function App() {
           <button onClick={() => reload({ forceRefreshSubjects: true })} disabled={status === 'loading'}>
             Full resync
           </button>
+          <button onClick={exportBackup}>Backup</button>
+          <button onClick={forceUpdate}>Check for updates</button>
           <button className="app__signout" onClick={clearToken}>
             Sign out
           </button>
@@ -147,7 +151,12 @@ export default function App() {
             />
           )}
 
-          <HistoryTrend progressHistory={progressHistory} className="tile--history card--gold" />
+          <HistoryTrend
+            progressHistory={progressHistory}
+            onEditEntry={editHistoryEntry}
+            onDeleteEntry={deleteHistoryEntry}
+            className="tile--history card--gold"
+          />
         </main>
       )}
     </div>

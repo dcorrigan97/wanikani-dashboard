@@ -1,7 +1,26 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { importBackup } from '../utils/backup.js';
 
 export default function TokenSetup({ onSubmit }) {
   const [value, setValue] = useState('');
+  const [restoreStatus, setRestoreStatus] = useState(null); // null | 'success' | 'error'
+  const [restoreMessage, setRestoreMessage] = useState('');
+  const fileInputRef = useRef(null);
+
+  const handleRestoreFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      await importBackup(file);
+      setRestoreStatus('success');
+      setRestoreMessage('Restored — reloading…');
+      setTimeout(() => window.location.reload(), 800);
+    } catch (err) {
+      setRestoreStatus('error');
+      setRestoreMessage(err.message || 'Could not restore that file.');
+    }
+    e.target.value = '';
+  };
 
   return (
     <div className="token-setup">
@@ -34,6 +53,24 @@ export default function TokenSetup({ onSubmit }) {
           Load my data
         </button>
       </form>
+
+      <div className="token-setup__restore">
+        <button type="button" onClick={() => fileInputRef.current?.click()}>
+          Restore from backup
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          style={{ display: 'none' }}
+          onChange={handleRestoreFile}
+        />
+        {restoreMessage && (
+          <p className={restoreStatus === 'error' ? 'status-message--error' : 'token-setup__note'}>
+            {restoreMessage}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

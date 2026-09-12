@@ -369,6 +369,13 @@ button:disabled {
   font-size: 11px;
   color: var(--ink-soft);
   min-width: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quiz-row__type {
+  font-weight: 600;
 }
 
 .quiz-row__form {

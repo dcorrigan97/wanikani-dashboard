@@ -2,6 +2,15 @@ import React, { useMemo, useState } from 'react';
 
 const MIN_DAYS = 3; // don't bother surfacing things reviewed within the last few days
 
+const TYPE_COLORS = { radical: '#8da4c2', kanji: '#e2604f', vocabulary: '#d9ae3e' };
+const TYPE_LABELS = { radical: 'Radical', kanji: 'Kanji', vocabulary: 'Vocabulary' };
+
+// kana_vocabulary (vocab written only in kana, e.g. だから) is grouped with
+// regular vocabulary here, same as the SRS Progress chart.
+function normalizeType(t) {
+  return t === 'kana_vocabulary' ? 'vocabulary' : t;
+}
+
 function primaryMeaning(subject) {
   const m = subject?.data?.meanings?.find((x) => x.primary) || subject?.data?.meanings?.[0];
   return m?.meaning ?? 'Unknown';
@@ -44,15 +53,17 @@ function checkReading(subject, input) {
   return readings.some((r) => r === trimmed);
 }
 
-function QuizRow({ subject, days }) {
+function QuizRow({ subject, days, type }) {
   const [meaningInput, setMeaningInput] = useState('');
   const [readingInput, setReadingInput] = useState('');
   const [checked, setChecked] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   const hasReading = (subject?.data?.readings?.length || 0) > 0;
   const meaningCorrect = checked && checkMeaning(subject, meaningInput);
   const readingCorrect = checked && (!hasReading || checkReading(subject, readingInput));
   const allCorrect = meaningCorrect && readingCorrect;
+  const typeColor = TYPE_COLORS[type];
 
   const handleCheck = (e) => {
     e.preventDefault();
@@ -60,21 +71,31 @@ function QuizRow({ subject, days }) {
   };
 
   const handleRetry = () => {
-    setChecked(false);
     setMeaningInput('');
     setReadingInput('');
+    setChecked(false);
+    // Forces the form (and its inputs) to fully remount on retry, so there's
+    // no chance of a disabled/value attribute lingering from the checked state.
+    setAttempt((a) => a + 1);
   };
 
   return (
     <div className={`quiz-row ${checked ? (allCorrect ? 'quiz-row--correct' : 'quiz-row--incorrect') : ''}`}>
-      <div className="quiz-row__char">{displayCharacters(subject)}</div>
-      <div className="quiz-row__meta">{days}d ago</div>
-      <form className="quiz-row__form" onSubmit={handleCheck}>
+      <div className="quiz-row__char" style={{ color: typeColor }} title={TYPE_LABELS[type]}>
+        {displayCharacters(subject)}
+      </div>
+      <div className="quiz-row__meta">
+        <span className="quiz-row__type" style={{ color: typeColor }}>
+          {TYPE_LABELS[type]}
+        </span>
+        <span>{days}d ago</span>
+      </div>
+      <form className="quiz-row__form" onSubmit={handleCheck} key={attempt}>
         {hasReading && (
           <input
             type="text"
             placeholder="Reading"
-            value={readingInput}
+            defaultValue=""
             onChange={(e) => setReadingInput(e.target.value)}
             disabled={checked}
             className={checked ? (readingCorrect ? 'quiz-input--correct' : 'quiz-input--incorrect') : ''}
@@ -83,12 +104,18 @@ function QuizRow({ subject, days }) {
         <input
           type="text"
           placeholder="Meaning"
-          value={meaningInput}
+          defaultValue=""
           onChange={(e) => setMeaningInput(e.target.value)}
           disabled={checked}
           className={checked ? (meaningCorrect ? 'quiz-input--correct' : 'quiz-input--incorrect') : ''}
         />
-        {!checked ? <button type="submit">Check</button> : <button type="button" onClick={handleRetry}>Retry</button>}
+        {!checked ? (
+          <button type="submit">Check</button>
+        ) : (
+          <button type="button" onClick={handleRetry}>
+            Retry
+          </button>
+        )}
       </form>
       {checked && !allCorrect && (
         <div className="quiz-row__answer">
@@ -109,6 +136,15 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
     assignments.forEach((a) => {
       if (a.data.hidden) return;
       map.set(a.data.subject_id, a.data.srs_stage);
+    });
+    return map;
+  }, [assignments]);
+
+  const typeBySubjectId = useMemo(() => {
+    const map = new Map();
+    assignments.forEach((a) => {
+      if (a.data.hidden) return;
+      map.set(a.data.subject_id, normalizeType(a.data.subject_type));
     });
     return map;
   }, [assignments]);
@@ -137,7 +173,12 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
       </p>
       <div className="quiz-list">
         {visible.map((rs) => (
-          <QuizRow key={rs.id} subject={subjectsById.get(rs.data.subject_id)} days={rs.days} />
+          <QuizRow
+            key={rs.id}
+            subject={subjectsById.get(rs.data.subject_id)}
+            days={rs.days}
+            type={typeBySubjectId.get(rs.data.subject_id)}
+          />
         ))}
         {neglected.length === 0 && (
           <p className="card__subtitle">Nothing's been neglected — you're keeping up with everything.</p>

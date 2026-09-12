@@ -103,7 +103,7 @@ function QuizRow({ subject, days, type }) {
         {hasReading && (
           <input
             type="text"
-            placeholder="Reading"
+            placeholder="Kanji"
             defaultValue=""
             onChange={(e) => setReadingInput(e.target.value)}
             disabled={checked}

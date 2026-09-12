@@ -92,7 +92,9 @@ export default function SRSProgress({ assignments, subjects }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
           <XAxis dataKey="name" stroke="#a59c8a" angle={-40} textAnchor="end" interval={0} tick={{ fontSize: 11 }} height={50} />
           <YAxis stroke="#a59c8a" allowDecimals={false} />
-          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} cursor={false} />
+          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
+            allowEscapeViewBox={{ x: true, y: true }}
+            offset={24} cursor={false} />
           <Legend />
           <Bar dataKey="radical" name="Radicals" stackId="a" fill={TYPE_COLORS.radical} cursor="pointer" onClick={handleBarClick('radical')} />
           <Bar dataKey="kanji" name="Kanji" stackId="a" fill={TYPE_COLORS.kanji} cursor="pointer" onClick={handleBarClick('kanji')} />

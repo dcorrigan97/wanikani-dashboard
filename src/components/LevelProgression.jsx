@@ -42,6 +42,8 @@ export default function LevelProgression({ levelProgressions }) {
           <YAxis stroke="#a59c8a" label={{ value: 'days', angle: -90, position: 'insideLeft', fill: '#a59c8a' }} />
           <Tooltip
             contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
+            allowEscapeViewBox={{ x: true, y: true }}
+            offset={24}
             cursor={false}
             formatter={(value, name, props) => [
               `${value} days${props.payload.inProgress ? ' (in progress)' : ''}`,

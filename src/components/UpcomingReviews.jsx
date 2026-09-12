@@ -40,6 +40,8 @@ export default function UpcomingReviews({ assignments }) {
           <YAxis stroke="#a59c8a" allowDecimals={false} />
           <Tooltip
             contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
+            allowEscapeViewBox={{ x: true, y: true }}
+            offset={24}
             cursor={false}
             formatter={(value) => [value, 'reviews']}
           />

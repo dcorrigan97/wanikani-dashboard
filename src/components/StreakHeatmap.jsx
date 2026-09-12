@@ -1,7 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const WEEKS_TO_SHOW = 12; // narrower tile in the bento layout than before
 const COLORS = ['#2c2419', '#3d2620', '#6b2f28', '#a8412f', '#e2604f'];
+
+function formatDateShort(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
 
 // Local-timezone Y-M-D key, NOT toISOString() — toISOString converts to UTC,
 // which shifts evening activity onto the wrong calendar day for anyone west
@@ -35,6 +41,7 @@ function colorForCount(count, max) {
  * even though you were studying that day.
  */
 export default function StreakHeatmap({ reviewStatistics, assignments }) {
+  const [activeDay, setActiveDay] = useState(null);
   const { days, max, currentStreak, itemsTracked } = useMemo(() => {
     const counts = new Map();
     const bump = (key) => counts.set(key, (counts.get(key) || 0) + 1);
@@ -82,7 +89,12 @@ export default function StreakHeatmap({ reviewStatistics, assignments }) {
           day{currentStreak === 1 ? '' : 's'} in a row · {itemsTracked.toLocaleString()} items tracked
         </p>
       </div>
-      <div className="heatmap-grid" style={{ justifyContent: 'center', marginTop: '18px' }}>
+      <div className="heatmap-info">
+        {activeDay
+          ? `${formatDateShort(activeDay.key)} — activity on ${activeDay.count} item${activeDay.count === 1 ? '' : 's'}`
+          : 'Hover or tap a square to see that day'}
+      </div>
+      <div className="heatmap-grid" style={{ justifyContent: 'center', marginTop: '6px' }}>
         {weeks.map((week, wi) => (
           <div className="heatmap-grid__col" key={wi}>
             {week.map((day) => (
@@ -90,7 +102,9 @@ export default function StreakHeatmap({ reviewStatistics, assignments }) {
                 key={day.key}
                 className="heatmap-grid__cell"
                 style={{ backgroundColor: colorForCount(day.count, max) }}
-                title={`${day.key}: activity on ${day.count} item${day.count === 1 ? '' : 's'}`}
+                onMouseEnter={() => setActiveDay(day)}
+                onMouseLeave={() => setActiveDay(null)}
+                onClick={() => setActiveDay(day)}
               />
             ))}
           </div>

@@ -46,7 +46,9 @@ export default function HistoryTrend({ progressHistory, onEditEntry, onDeleteEnt
           <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
           <XAxis dataKey="date" stroke="#a59c8a" />
           <YAxis stroke="#a59c8a" allowDecimals={false} />
-          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }} />
+          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
+            allowEscapeViewBox={{ x: true, y: true }}
+            offset={24} />
           <Legend />
           <Line type="monotone" dataKey="started" name="Items started" stroke="#8da4c2" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="burned" name="Burned" stroke="#e2604f" dot={false} strokeWidth={2} />

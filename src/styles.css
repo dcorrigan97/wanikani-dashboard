@@ -736,6 +736,7 @@ button:disabled {
   height: 14px;
   border-radius: 3px;
   flex: 0 0 auto;
+  cursor: pointer;
   transition: transform 0.15s ease;
   transform-origin: center;
   -webkit-tap-highlight-color: transparent;
@@ -746,4 +747,11 @@ button:disabled {
   transform: scale(1.4);
   position: relative;
   z-index: 2;
+}
+
+.heatmap-info {
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+  min-height: 16px;
 }

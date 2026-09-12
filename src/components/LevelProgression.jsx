@@ -43,7 +43,8 @@ export default function LevelProgression({ levelProgressions }) {
           <Tooltip
             contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
             allowEscapeViewBox={{ x: true, y: true }}
-            offset={24}
+            position={{ y: -10 }}
+            wrapperStyle={{ zIndex: 100 }}
             cursor={false}
             formatter={(value, name, props) => [
               `${value} days${props.payload.inProgress ? ' (in progress)' : ''}`,

@@ -48,7 +48,8 @@ export default function HistoryTrend({ progressHistory, onEditEntry, onDeleteEnt
           <YAxis stroke="#a59c8a" allowDecimals={false} />
           <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
             allowEscapeViewBox={{ x: true, y: true }}
-            offset={24} />
+            position={{ y: -10 }}
+            wrapperStyle={{ zIndex: 100 }} />
           <Legend />
           <Line type="monotone" dataKey="started" name="Items started" stroke="#8da4c2" dot={false} strokeWidth={2} />
           <Line type="monotone" dataKey="burned" name="Burned" stroke="#e2604f" dot={false} strokeWidth={2} />

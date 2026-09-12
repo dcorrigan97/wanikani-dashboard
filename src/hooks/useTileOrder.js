@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const ORDER_KEY = 'wk_tile_order_v1';
-export const DEFAULT_ORDER = ['streak', 'srs', 'level', 'upcoming', 'trickiest', 'leeches', 'history'];
+export const DEFAULT_ORDER = ['streak', 'srs', 'level', 'upcoming', 'trickiest', 'leeches', 'neglected', 'history'];
 
 function loadOrder() {
   try {

@@ -13,6 +13,7 @@ import LevelProgression from './components/LevelProgression.jsx';
 import UpcomingReviews from './components/UpcomingReviews.jsx';
 import HistoryTrend from './components/HistoryTrend.jsx';
 import LeechDetector from './components/LeechDetector.jsx';
+import NeglectedItems from './components/NeglectedItems.jsx';
 import CardError from './components/CardError.jsx';
 
 export default function App() {
@@ -141,6 +142,25 @@ export default function App() {
         ) : (
           <CardError
             label="Leeches"
+            message={errors.assignments || errors.reviewStatistics || errors.subjects}
+            onRetry={reload}
+          />
+        ),
+    },
+    neglected: {
+      label: "Haven't Seen Lately",
+      sizeClass: 'span-full',
+      accentClass: 'card--indigo',
+      render: () =>
+        has('assignments', 'reviewStatistics', 'subjects') ? (
+          <NeglectedItems
+            assignments={data.assignments}
+            reviewStatistics={data.reviewStatistics}
+            subjects={data.subjects}
+          />
+        ) : (
+          <CardError
+            label="Haven't Seen Lately"
             message={errors.assignments || errors.reviewStatistics || errors.subjects}
             onRetry={reload}
           />

@@ -48,6 +48,7 @@ button {
   font-size: 14px;
   font-family: 'Zen Kaku Gothic New', sans-serif;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 button:hover:not(:disabled) {
@@ -139,7 +140,22 @@ button:disabled {
 .app__actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+.app__actions button {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .app__actions {
+    gap: 6px;
+  }
+  .app__actions button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 }
 
 .app__signout {
@@ -156,6 +172,15 @@ button:disabled {
   background: linear-gradient(135deg, var(--hanko), var(--indigo));
   padding: 8px 20px;
   border-radius: 999px;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .level-badge {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
 }
 
 .status-message {

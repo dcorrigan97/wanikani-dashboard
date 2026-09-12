@@ -40,6 +40,7 @@ export default function UpcomingReviews({ assignments }) {
           <YAxis stroke="#a59c8a" allowDecimals={false} />
           <Tooltip
             contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
+            cursor={false}
             formatter={(value) => [value, 'reviews']}
           />
           <Bar dataKey="count" fill="#8da4c2" radius={[3, 3, 0, 0]} />

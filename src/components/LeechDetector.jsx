@@ -19,7 +19,7 @@ function displayCharacters(subject) {
   return '(radical image)';
 }
 
-export default function LeechDetector({ assignments, reviewStatistics, subjects, className = '' }) {
+export default function LeechDetector({ assignments, reviewStatistics, subjects }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
   const [revealed, setRevealed] = useState(new Set());
   const [expanded, setExpanded] = useState(false);
@@ -59,7 +59,7 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
   const visible = expanded ? leeches : leeches.slice(0, 5);
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>Leeches</h2>
       <p className="card__subtitle">
         Stuck below Guru despite {MIN_ATTEMPTS}+ reviews · tap a row to reveal
@@ -110,6 +110,6 @@ export default function LeechDetector({ assignments, reviewStatistics, subjects,
           {expanded ? '▴ Show less' : `▾ Show all ${leeches.length}`}
         </button>
       )}
-    </div>
+    </>
   );
 }

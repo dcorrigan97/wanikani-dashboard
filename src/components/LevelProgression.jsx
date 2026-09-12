@@ -5,7 +5,7 @@ function daysBetween(a, b) {
   return Math.max(0, (new Date(b) - new Date(a)) / (1000 * 60 * 60 * 24));
 }
 
-export default function LevelProgression({ levelProgressions, className = '' }) {
+export default function LevelProgression({ levelProgressions }) {
   const chartData = useMemo(() => {
     return levelProgressions
       .filter((lp) => lp.data.started_at)
@@ -30,7 +30,7 @@ export default function LevelProgression({ levelProgressions, className = '' }) 
     : 0;
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>Level Progression</h2>
       <p className="card__subtitle">
         {completedDays.length} level{completedDays.length === 1 ? '' : 's'} completed · avg {avg} days/level
@@ -54,6 +54,6 @@ export default function LevelProgression({ levelProgressions, className = '' }) 
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </>
   );
 }

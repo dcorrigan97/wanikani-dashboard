@@ -34,7 +34,7 @@ function colorForCount(count, max) {
  * (common right after starting the app) would otherwise show as inactive
  * even though you were studying that day.
  */
-export default function StreakHeatmap({ reviewStatistics, assignments, className = '' }) {
+export default function StreakHeatmap({ reviewStatistics, assignments }) {
   const { days, max, currentStreak, itemsTracked } = useMemo(() => {
     const counts = new Map();
     const bump = (key) => counts.set(key, (counts.get(key) || 0) + 1);
@@ -74,7 +74,7 @@ export default function StreakHeatmap({ reviewStatistics, assignments, className
   }
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>Study Streak</h2>
       <div className="streak-hero">
         <div className="streak-hero__num">{currentStreak}</div>
@@ -100,6 +100,6 @@ export default function StreakHeatmap({ reviewStatistics, assignments, className
         WaniKani no longer exposes per-review history via the API, so this approximates daily activity from lesson
         start dates and last-reviewed dates rather than a full event log.
       </p>
-    </div>
+    </>
   );
 }

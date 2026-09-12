@@ -18,7 +18,7 @@ function displayCharacters(subject) {
   return '(radical image)';
 }
 
-export default function AccuracyBreakdown({ reviewStatistics, subjects, className = '' }) {
+export default function AccuracyBreakdown({ reviewStatistics, subjects }) {
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
   const [revealed, setRevealed] = useState(new Set());
   const [expanded, setExpanded] = useState(false);
@@ -51,7 +51,7 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
   const visible = expanded ? worst : worst.slice(0, 5);
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>Trickiest Items</h2>
       <p className="card__subtitle">Lowest accuracy, min. {MIN_ATTEMPTS} reviews · tap a row to reveal</p>
       <table className="accuracy-table">
@@ -102,6 +102,6 @@ export default function AccuracyBreakdown({ reviewStatistics, subjects, classNam
           {expanded ? '▴ Show less' : `▾ Show all ${worst.length}`}
         </button>
       )}
-    </div>
+    </>
   );
 }

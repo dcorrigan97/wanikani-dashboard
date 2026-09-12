@@ -36,7 +36,7 @@ function primaryReading(subject) {
   return readings && readings.length ? readings.join('、') : '—';
 }
 
-export default function SRSProgress({ assignments, subjects, className = '' }) {
+export default function SRSProgress({ assignments, subjects }) {
   const [selected, setSelected] = useState(null); // { bucketLabel, type } | null
   const [expandedChips, setExpandedChips] = useState(new Set());
   const subjectsById = useMemo(() => new Map(subjects.map((s) => [s.id, s])), [subjects]);
@@ -84,7 +84,7 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
   };
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>SRS Progress</h2>
       <p className="card__subtitle">{totalStarted.toLocaleString()} items currently in the SRS system · tap a bar segment to see the items</p>
       <ResponsiveContainer width="100%" height={310} className="srs-chart">
@@ -141,6 +141,6 @@ export default function SRSProgress({ assignments, subjects, className = '' }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

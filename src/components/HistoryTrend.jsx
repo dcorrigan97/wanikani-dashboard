@@ -10,7 +10,7 @@ function yesterdayKey() {
   return `${y}-${m}-${day}`;
 }
 
-export default function HistoryTrend({ progressHistory, onEditEntry, onDeleteEntry, className = '' }) {
+export default function HistoryTrend({ progressHistory, onEditEntry, onDeleteEntry }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ date: yesterdayKey(), started: '', burned: '' });
 
@@ -34,7 +34,7 @@ export default function HistoryTrend({ progressHistory, onEditEntry, onDeleteEnt
   const recent = [...progressHistory].reverse().slice(0, 10);
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>Progress Over Time</h2>
       <p className="card__subtitle">
         {hasEnoughData
@@ -104,6 +104,6 @@ export default function HistoryTrend({ progressHistory, onEditEntry, onDeleteEnt
         WaniKani's API doesn't expose historical trend data, so this chart is built from a snapshot saved locally
         each time you open the dashboard — it only knows about days you've actually opened this app on this device.
       </p>
-    </div>
+    </>
   );
 }

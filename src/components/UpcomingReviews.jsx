@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 
 const HOURS_AHEAD = 24;
 
-export default function UpcomingReviews({ assignments, className = '' }) {
+export default function UpcomingReviews({ assignments }) {
   const { dueNow, buckets, totalNext24h } = useMemo(() => {
     const now = new Date();
     let dueNow = 0;
@@ -28,7 +28,7 @@ export default function UpcomingReviews({ assignments, className = '' }) {
   }, [assignments]);
 
   return (
-    <div className={`card ${className}`}>
+    <>
       <h2>Upcoming Reviews</h2>
       <p className="card__subtitle">
         {dueNow.toLocaleString()} due right now · {totalNext24h.toLocaleString()} more in the next 24h
@@ -45,6 +45,6 @@ export default function UpcomingReviews({ assignments, className = '' }) {
           <Bar dataKey="count" fill="#8da4c2" radius={[3, 3, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </>
   );
 }

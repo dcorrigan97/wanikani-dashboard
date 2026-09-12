@@ -311,6 +311,25 @@ button:disabled {
   cursor: grabbing;
 }
 
+.tile-resize-handle {
+  position: absolute;
+  top: 10px;
+  right: 48px;
+  padding: 6px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  text-transform: capitalize;
+  z-index: 5;
+}
+
+.tile-resize-handle:hover {
+  border-color: var(--hanko);
+  color: var(--ink);
+}
+
 .card h2 {
   font-size: 17px;
   margin: 0 0 2px;

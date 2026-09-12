@@ -3,6 +3,7 @@ import Sortable from 'sortablejs';
 import { useWaniKaniData } from './hooks/useWaniKaniData.js';
 import { usePullToRefresh } from './hooks/usePullToRefresh.js';
 import { useTileOrder } from './hooks/useTileOrder.js';
+import { useTileSizes, RESIZABLE_IDS, SIZE_CLASSES } from './hooks/useTileSizes.js';
 import { exportBackup } from './utils/backup.js';
 import { forceUpdate } from './utils/swUpdate.js';
 import TokenSetup from './components/TokenSetup.jsx';
@@ -32,6 +33,7 @@ export default function App() {
   } = useWaniKaniData();
 
   const { order, setOrder, resetOrder } = useTileOrder();
+  const { sizes, cycleSize, resetSizes } = useTileSizes();
   const [editingLayout, setEditingLayout] = useState(false);
   const gridRef = useRef(null);
   const sortableRef = useRef(null);
@@ -195,7 +197,14 @@ export default function App() {
           {data?.user && <span className="level-badge">Level {data.user.level}</span>}
           {editingLayout ? (
             <>
-              <button onClick={resetOrder}>Reset layout</button>
+              <button
+                onClick={() => {
+                  resetOrder();
+                  resetSizes();
+                }}
+              >
+                Reset layout
+              </button>
               <button onClick={() => setEditingLayout(false)}>Done</button>
             </>
           ) : (
@@ -231,13 +240,24 @@ export default function App() {
           {order.map((id) => {
             const def = TILE_DEFS[id];
             if (!def) return null;
+            const isResizable = RESIZABLE_IDS.includes(id);
+            const sizeClass = isResizable ? SIZE_CLASSES[sizes[id] || 'full'] : def.sizeClass;
             return (
               <div
                 key={id}
                 data-tile-id={id}
-                className={`card ${def.accentClass} ${def.sizeClass} ${editingLayout ? 'card--editing' : ''}`}
+                className={`card ${def.accentClass} ${sizeClass} ${editingLayout ? 'card--editing' : ''}`}
               >
-                {editingLayout && <div className="tile-drag-handle">⠿</div>}
+                {editingLayout && (
+                  <>
+                    <div className="tile-drag-handle">⠿</div>
+                    {isResizable && (
+                      <button className="tile-resize-handle" onClick={() => cycleSize(id)}>
+                        {sizes[id] || 'full'}
+                      </button>
+                    )}
+                  </>
+                )}
                 {def.render()}
               </div>
             );

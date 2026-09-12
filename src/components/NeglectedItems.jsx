@@ -91,6 +91,15 @@ function QuizRow({ subject, days, type }) {
         <span>{days}d ago</span>
       </div>
       <form className="quiz-row__form" onSubmit={handleCheck} key={attempt}>
+        <input
+          type="text"
+          placeholder="Meaning"
+          defaultValue=""
+          onChange={(e) => setMeaningInput(e.target.value)}
+          disabled={checked}
+          translate="no"
+          className={checked ? (meaningCorrect ? 'quiz-input--correct' : 'quiz-input--incorrect') : ''}
+        />
         {hasReading && (
           <input
             type="text"
@@ -98,17 +107,10 @@ function QuizRow({ subject, days, type }) {
             defaultValue=""
             onChange={(e) => setReadingInput(e.target.value)}
             disabled={checked}
+            translate="no"
             className={checked ? (readingCorrect ? 'quiz-input--correct' : 'quiz-input--incorrect') : ''}
           />
         )}
-        <input
-          type="text"
-          placeholder="Meaning"
-          defaultValue=""
-          onChange={(e) => setMeaningInput(e.target.value)}
-          disabled={checked}
-          className={checked ? (meaningCorrect ? 'quiz-input--correct' : 'quiz-input--incorrect') : ''}
-        />
         {!checked ? (
           <button type="submit">Check</button>
         ) : (

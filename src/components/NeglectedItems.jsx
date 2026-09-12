@@ -166,7 +166,7 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
   const [minDays, setMinDays] = useState(DEFAULT_MIN_DAYS);
 
   const neglected = useMemo(
-    () => allCandidates.filter((rs) => rs.days >= minDays).slice(0, 30),
+    () => allCandidates.filter((rs) => rs.days === minDays).slice(0, 30),
     [allCandidates, minDays]
   );
 
@@ -180,7 +180,7 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
       </p>
       <div className="quiz-slider">
         <label htmlFor="neglected-min-days">
-          Showing items unseen for <strong>{minDays}+</strong> day{minDays === 1 ? '' : 's'}
+          Showing items last seen exactly <strong>{minDays}</strong> day{minDays === 1 ? '' : 's'} ago
         </label>
         <input
           id="neglected-min-days"
@@ -201,7 +201,7 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
           />
         ))}
         {neglected.length === 0 && (
-          <p className="card__subtitle">Nothing's been neglected — you're keeping up with everything.</p>
+          <p className="card__subtitle">Nothing was last seen exactly {minDays} day{minDays === 1 ? '' : 's'} ago — try a different value.</p>
         )}
       </div>
       {neglected.length > 5 && (

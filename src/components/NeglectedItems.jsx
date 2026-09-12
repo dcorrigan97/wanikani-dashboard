@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 
-const MIN_DAYS = 3; // don't bother surfacing things reviewed within the last few days
+const DEFAULT_MIN_DAYS = 3; // starting point for the slider
 
 const TYPE_COLORS = { radical: '#8da4c2', kanji: '#e2604f', vocabulary: '#d9ae3e' };
 const TYPE_LABELS = { radical: 'Radical', kanji: 'Kanji', vocabulary: 'Vocabulary' };
@@ -149,7 +149,7 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
     return map;
   }, [assignments]);
 
-  const neglected = useMemo(() => {
+  const allCandidates = useMemo(() => {
     return reviewStatistics
       .filter((rs) => !rs.data.hidden && rs.data_updated_at)
       .map((rs) => {
@@ -158,10 +158,17 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
       })
       // Burned items are considered "done" by WaniKani's own design — no
       // need to nag about those. Only surface things still active in SRS.
-      .filter((rs) => rs.stage > 0 && rs.stage < 9 && rs.days >= MIN_DAYS)
-      .sort((a, b) => b.days - a.days)
-      .slice(0, 20);
+      .filter((rs) => rs.stage > 0 && rs.stage < 9)
+      .sort((a, b) => b.days - a.days);
   }, [reviewStatistics, stageBySubjectId]);
+
+  const sliderMax = Math.max(7, Math.min(90, allCandidates[0]?.days || 7));
+  const [minDays, setMinDays] = useState(DEFAULT_MIN_DAYS);
+
+  const neglected = useMemo(
+    () => allCandidates.filter((rs) => rs.days >= minDays).slice(0, 30),
+    [allCandidates, minDays]
+  );
 
   const visible = expanded ? neglected : neglected.slice(0, 5);
 
@@ -171,6 +178,19 @@ export default function NeglectedItems({ assignments, reviewStatistics, subjects
       <p className="card__subtitle">
         For self-practice only — doesn't submit anything back to WaniKani · type your answer and check
       </p>
+      <div className="quiz-slider">
+        <label htmlFor="neglected-min-days">
+          Showing items unseen for <strong>{minDays}+</strong> day{minDays === 1 ? '' : 's'}
+        </label>
+        <input
+          id="neglected-min-days"
+          type="range"
+          min="0"
+          max={sliderMax}
+          value={minDays}
+          onChange={(e) => setMinDays(Number(e.target.value))}
+        />
+      </div>
       <div className="quiz-list">
         {visible.map((rs) => (
           <QuizRow

@@ -1,14 +1,24 @@
 import { useState } from 'react';
 
-const SIZE_KEY = 'wk_tile_sizes_v1';
+const SIZE_KEY = 'wk_tile_sizes_v2';
 
-// Only these tiles support resizing — Study Streak (tall hero) and SRS
-// Progress (needs width for 9 bars) keep their fixed sizes.
-export const RESIZABLE_IDS = ['trickiest', 'leeches', 'neglected', 'history'];
-const DEFAULTS = { trickiest: 'full', leeches: 'full', neglected: 'full', history: 'full' };
+// quarter = 1 of 4 columns, normal = 2, wide = 3, full = all 4.
+export const SIZE_CLASSES = { quarter: 'span-1', normal: 'span-2', wide: 'span-3', full: 'span-full' };
+const CYCLE = ['quarter', 'normal', 'wide', 'full'];
 
-export const SIZE_CLASSES = { full: 'span-full', wide: 'span-col2', normal: '' };
-const CYCLE = ['full', 'wide', 'normal'];
+// Defaults match the look the dashboard already had before per-tile sizing
+// existed: Streak/Level/Upcoming were narrow (quarter), SRS was wide, and
+// the tables/history chart were full-width.
+const DEFAULTS = {
+  streak: 'quarter',
+  srs: 'wide',
+  level: 'quarter',
+  upcoming: 'quarter',
+  trickiest: 'full',
+  leeches: 'full',
+  neglected: 'full',
+  history: 'full',
+};
 
 function loadSizes() {
   try {

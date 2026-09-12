@@ -3,7 +3,7 @@ import Sortable from 'sortablejs';
 import { useWaniKaniData } from './hooks/useWaniKaniData.js';
 import { usePullToRefresh } from './hooks/usePullToRefresh.js';
 import { useTileOrder } from './hooks/useTileOrder.js';
-import { useTileSizes, RESIZABLE_IDS, SIZE_CLASSES } from './hooks/useTileSizes.js';
+import { useTileSizes, SIZE_CLASSES } from './hooks/useTileSizes.js';
 import { exportBackup } from './utils/backup.js';
 import { forceUpdate } from './utils/swUpdate.js';
 import TokenSetup from './components/TokenSetup.jsx';
@@ -77,7 +77,7 @@ export default function App() {
   const TILE_DEFS = {
     streak: {
       label: 'Study Streak',
-      sizeClass: 'span-tall2',
+      extraClass: 'span-tall2',
       accentClass: 'card--streak',
       render: () =>
         has('reviewStatistics', 'assignments') ? (
@@ -88,7 +88,6 @@ export default function App() {
     },
     srs: {
       label: 'SRS Progress',
-      sizeClass: 'span-col2',
       accentClass: 'card--indigo',
       render: () =>
         has('assignments', 'subjects') ? (
@@ -99,7 +98,6 @@ export default function App() {
     },
     level: {
       label: 'Level Progression',
-      sizeClass: '',
       accentClass: 'card--gold',
       render: () =>
         has('levelProgressions') ? (
@@ -110,7 +108,6 @@ export default function App() {
     },
     upcoming: {
       label: 'Upcoming Reviews',
-      sizeClass: '',
       accentClass: 'card--indigo',
       render: () =>
         has('assignments') ? (
@@ -121,7 +118,6 @@ export default function App() {
     },
     trickiest: {
       label: 'Trickiest Items',
-      sizeClass: 'span-full',
       accentClass: 'card--sage',
       render: () =>
         has('reviewStatistics', 'subjects') ? (
@@ -132,7 +128,6 @@ export default function App() {
     },
     leeches: {
       label: 'Leeches',
-      sizeClass: 'span-full',
       accentClass: 'card--streak',
       render: () =>
         has('assignments', 'reviewStatistics', 'subjects') ? (
@@ -151,7 +146,6 @@ export default function App() {
     },
     neglected: {
       label: "Haven't Seen Lately",
-      sizeClass: 'span-full',
       accentClass: 'card--indigo',
       render: () =>
         has('assignments', 'reviewStatistics', 'subjects') ? (
@@ -170,7 +164,6 @@ export default function App() {
     },
     history: {
       label: 'Progress Over Time',
-      sizeClass: 'span-full',
       accentClass: 'card--gold',
       render: () => (
         <HistoryTrend
@@ -240,22 +233,20 @@ export default function App() {
           {order.map((id) => {
             const def = TILE_DEFS[id];
             if (!def) return null;
-            const isResizable = RESIZABLE_IDS.includes(id);
-            const sizeClass = isResizable ? SIZE_CLASSES[sizes[id] || 'full'] : def.sizeClass;
+            const sizeClass = SIZE_CLASSES[sizes[id] || 'full'];
+            const extraClass = def.extraClass || '';
             return (
               <div
                 key={id}
                 data-tile-id={id}
-                className={`card ${def.accentClass} ${sizeClass} ${editingLayout ? 'card--editing' : ''}`}
+                className={`card ${def.accentClass} ${sizeClass} ${extraClass} ${editingLayout ? 'card--editing' : ''}`}
               >
                 {editingLayout && (
                   <>
                     <div className="tile-drag-handle">⠿</div>
-                    {isResizable && (
-                      <button className="tile-resize-handle" onClick={() => cycleSize(id)}>
-                        {sizes[id] || 'full'}
-                      </button>
-                    )}
+                    <button className="tile-resize-handle" onClick={() => cycleSize(id)}>
+                      {sizes[id] || 'full'}
+                    </button>
                   </>
                 )}
                 {def.render()}

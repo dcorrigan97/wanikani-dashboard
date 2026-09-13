@@ -755,3 +755,33 @@ button:disabled {
   color: var(--ink-soft);
   min-height: 16px;
 }
+
+/* --- SRS custom tooltip --- */
+
+.srs-tooltip {
+  background: var(--tile);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+}
+
+.srs-tooltip p {
+  margin: 3px 0;
+}
+
+.srs-tooltip__label {
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 6px !important;
+}
+
+.srs-tooltip__total {
+  margin-top: 8px !important;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-weight: 700;
+  color: var(--ink) !important;
+}

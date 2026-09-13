@@ -36,6 +36,22 @@ function primaryReading(subject) {
   return readings && readings.length ? readings.join('、') : '—';
 }
 
+function SRSTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+  const real = payload[0]?.payload?.real;
+  if (!real) return null;
+  const total = real.radical + real.kanji + real.vocabulary;
+  return (
+    <div className="srs-tooltip">
+      <p className="srs-tooltip__label">{label}</p>
+      <p style={{ color: TYPE_COLORS.radical }}>Radicals : {real.radical}</p>
+      <p style={{ color: TYPE_COLORS.kanji }}>Kanji : {real.kanji}</p>
+      <p style={{ color: TYPE_COLORS.vocabulary }}>Vocabulary : {real.vocabulary}</p>
+      <p className="srs-tooltip__total">Total : {total}</p>
+    </div>
+  );
+}
+
 export default function SRSProgress({ assignments, subjects }) {
   const [selected, setSelected] = useState(null); // { bucketLabel, type } | null
   const [expandedChips, setExpandedChips] = useState(new Set());
@@ -44,7 +60,7 @@ export default function SRSProgress({ assignments, subjects }) {
   const started = useMemo(() => assignments.filter((a) => a.data.started_at && !a.data.hidden), [assignments]);
 
   const chartData = useMemo(() => {
-    return BUCKETS.map((bucket) => {
+    const rows = BUCKETS.map((bucket) => {
       const inBucket = started.filter((a) => bucket.stages.includes(a.data.srs_stage));
       const row = { name: bucket.label };
       ['radical', 'kanji', 'vocabulary'].forEach((type) => {
@@ -52,9 +68,26 @@ export default function SRSProgress({ assignments, subjects }) {
       });
       return row;
     });
+
+    // A stage with a handful of items renders as a sliver of a bar next to
+    // a stage with 100+ — nearly impossible to tap accurately on a phone.
+    // Give any non-zero segment a minimum visual height (tooltip/drilldown
+    // still use the real counts below, so this never misreports anything,
+    // it only makes small segments easier to actually hit).
+    const overallMax = Math.max(1, ...rows.map((r) => r.radical + r.kanji + r.vocabulary));
+    const floor = Math.max(1, Math.round(overallMax * 0.03));
+
+    return rows.map((row) => {
+      const real = { ...row };
+      const display = { ...row };
+      ['radical', 'kanji', 'vocabulary'].forEach((type) => {
+        if (row[type] > 0 && row[type] < floor) display[type] = floor;
+      });
+      return { ...display, real };
+    });
   }, [started]);
 
-  const totalStarted = chartData.reduce((sum, d) => sum + d.radical + d.kanji + d.vocabulary, 0);
+  const totalStarted = chartData.reduce((sum, d) => sum + d.real.radical + d.real.kanji + d.real.vocabulary, 0);
 
   const drilldownItems = useMemo(() => {
     if (!selected) return [];
@@ -92,10 +125,13 @@ export default function SRSProgress({ assignments, subjects }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#34291e" />
           <XAxis dataKey="name" stroke="#a59c8a" angle={-40} textAnchor="end" interval={0} tick={{ fontSize: 11 }} height={50} />
           <YAxis stroke="#a59c8a" allowDecimals={false} />
-          <Tooltip contentStyle={{ background: '#221d17', border: '1px solid #34291e' }}
+          <Tooltip
+            content={<SRSTooltip />}
             allowEscapeViewBox={{ x: true, y: true }}
             position={{ y: -10 }}
-            wrapperStyle={{ zIndex: 100 }} cursor={false} />
+            wrapperStyle={{ zIndex: 100 }}
+            cursor={false}
+          />
           <Legend />
           <Bar dataKey="radical" name="Radicals" stackId="a" fill={TYPE_COLORS.radical} cursor="pointer" onClick={handleBarClick('radical')} />
           <Bar dataKey="kanji" name="Kanji" stackId="a" fill={TYPE_COLORS.kanji} cursor="pointer" onClick={handleBarClick('kanji')} />

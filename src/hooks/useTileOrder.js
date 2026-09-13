@@ -24,13 +24,21 @@ function loadOrder() {
 export function useTileOrder() {
   const [order, setOrderState] = useState(loadOrder);
 
-  const setOrder = (next) => {
-    setOrderState(next);
-    try {
-      localStorage.setItem(ORDER_KEY, JSON.stringify(next));
-    } catch (err) {
-      console.warn('Could not save tile order:', err.message);
-    }
+  // Accepts either a plain array or a functional updater (prev => next),
+  // matching how React's own setState works — this matters because the
+  // drag-and-drop handler calls this with a function, and a naive
+  // "just JSON.stringify whatever was passed in" would try to serialize
+  // the function itself instead of the resolved array.
+  const setOrder = (updater) => {
+    setOrderState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      try {
+        localStorage.setItem(ORDER_KEY, JSON.stringify(next));
+      } catch (err) {
+        console.warn('Could not save tile order:', err.message);
+      }
+      return next;
+    });
   };
 
   const resetOrder = () => setOrder(DEFAULT_ORDER);
